@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: -7177398042134863186}
   m_Layer: 0
   m_Name: Bullet
-  m_TagString: Untagged
+  m_TagString: Bullet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -163,3 +163,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 20
   lifeTime: 3
+  sparkEffectPrefab: {fileID: 1510160415959342620, guid: c374dade67e33ee4ea7876fb4b7b6867, type: 3}
