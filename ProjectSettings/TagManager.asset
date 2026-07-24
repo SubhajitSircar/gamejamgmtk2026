@@ -12,9 +12,9 @@ TagManager:
   - 
   - Water
   - UI
+  - Laser
   - 
-  - 
-  - 
+  - Darkness
   - 
   - 
   - 
@@ -41,4 +41,7 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Laser
+    uniqueID: 3888826021
     locked: 0

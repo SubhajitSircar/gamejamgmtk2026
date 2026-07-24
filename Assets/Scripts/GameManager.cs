@@ -8,6 +8,8 @@ public class GameManager : MonoBehaviour
 
     public bool isDuelActive = false;
 
+//    public DarknessManager darknessManager;
+
     [Header("UI References")]
     public TextMeshProUGUI centerText;
 
@@ -39,6 +41,9 @@ public class GameManager : MonoBehaviour
         // Unlock inputs and start the duel
         centerText.text = "DRAW!!";
         isDuelActive = true;
+
+//        darknessManager.EnableDarkness();
+
 
         // Hide the DRAW text after 2 seconds
         yield return new WaitForSeconds(2f);
