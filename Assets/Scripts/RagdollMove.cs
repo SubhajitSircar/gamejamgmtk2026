@@ -7,22 +7,22 @@ public class RagdollArmLook : MonoBehaviour
     [SerializeField] private float motorSpeed = 500f;
     [SerializeField] private float maxMotorTorque = 1000f;
 
-    private HingeJoint2D hingeJoint;
+    private HingeJoint2D hj;
     private Rigidbody2D rb;
     private Camera mainCamera;
 
     void Start()
     {
-        hingeJoint = GetComponent<HingeJoint2D>();
+        hj = GetComponent<HingeJoint2D>();
         rb = GetComponent<Rigidbody2D>();
         mainCamera = Camera.main;
 
         // Ensure the joint is configured to use the motor system
-        hingeJoint.useMotor = true;
+        hj.useMotor = true;
         
-        JointMotor2D motor = hingeJoint.motor;
+        JointMotor2D motor = hj.motor;
         motor.maxMotorTorque = maxMotorTorque;
-        hingeJoint.motor = motor;
+        hj.motor = motor;
     }
 
     void FixedUpdate()
@@ -36,20 +36,20 @@ public class RagdollArmLook : MonoBehaviour
 
         // Adjust target angle relative to the Torso's rotation 
         // (Hinge Joint limits operate relative to the parent connected body)
-        if (hingeJoint.connectedBody != null)
+        if (hj.connectedBody != null)
         {
-            targetAngle -= hingeJoint.connectedBody.rotation;
+            targetAngle -= hj.connectedBody.rotation;
         }
 
         // 3. Normalize the angles between -180 and 180 degrees
         targetAngle = Mathf.DeltaAngle(0, targetAngle);
-        float currentAngle = hingeJoint.jointAngle;
+        float currentAngle = hj.jointAngle;
 
         // 4. Calculate the shortest directional step to reach the target angle
         float angleDifference = Mathf.DeltaAngle(currentAngle, targetAngle);
 
         // 5. Apply motor velocity based on how far away the target is
-        JointMotor2D motor = hingeJoint.motor;
+        JointMotor2D motor = hj.motor;
         
         // If the angle difference is small, slow down to prevent jittering
         if (Mathf.Abs(angleDifference) > 1f)
@@ -62,6 +62,6 @@ public class RagdollArmLook : MonoBehaviour
             motor.motorSpeed = 0f;
         }
 
-        hingeJoint.motor = motor;
+        hj.motor = motor;
     }
 }

@@ -35,6 +35,12 @@ public class PlayerDeath : MonoBehaviour
         head.parent = null;
         body.parent = null;
 
+        // 3.1 activate gravity in the head for a valid fall
+        //if (head.GetComponent<Rigidbody2D>() != null)
+        //{
+        //    head.GetComponent<Rigidbody2D>().gravityScale = 1;
+        //}
+
         // 4. Start the grotesque animations
         StartCoroutine(AnimateHead(fallDirection));
         StartCoroutine(AnimateBody(fallDirection));
@@ -44,7 +50,7 @@ public class PlayerDeath : MonoBehaviour
     {
         Vector3 startPos = head.position;
         // Target: Fly backward and drop down to the floor level
-        Vector3 endPos = startPos + new Vector3(dir * 2.5f, -1.5f, 0);
+        Vector3 endPos = startPos + new Vector3(dir * 2.5f, -2.5f, 0);
 
         float duration = 1.5f; // Slow, dramatic rolling time
         float elapsed = 0f;
