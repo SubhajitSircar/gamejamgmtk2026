@@ -1,3 +1,4 @@
+using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 
 public class Bullet : MonoBehaviour
@@ -40,22 +41,43 @@ public class Bullet : MonoBehaviour
         }
     }
 
+    [Header("VFX")]
+    public GameObject sparkEffectPrefab; // Add this variable at the very top of your script!
+
+    // ... your other code ...
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        // Check if we hit a head
-        if (collision.gameObject.name == "Head")
+        // 1. CHECK FOR BULLET CLASH FIRST
+        if (collision.gameObject.CompareTag("Bullet"))
         {
-            // Go up the hierarchy to find the main Player root and grab our new script
-            PlayerDeath deathScript = collision.transform.root.GetComponent<PlayerDeath>();
-
-            if (deathScript != null)
+            // Spawn the sparks at the exact point where they touched
+            if (sparkEffectPrefab != null)
             {
-                // Trigger the death sequence, passing the bullet's current speed direction
-                deathScript.TriggerDeath(rb.velocity.x);
+                // Grab the contact point
+                Vector2 contactPoint = collision.GetContact(0).point;
+                Instantiate(sparkEffectPrefab, contactPoint, Quaternion.identity);
             }
+
+            // Optional Juice: Add a tiny micro-shake to the camera to sell the impact
+            if (CameraShake.instance != null)
+            {
+                CameraShake.instance.Shake(0.1f, 0.15f);
+            }
+
+            // Destroy this bullet and STOP running the rest of the code
+            Destroy(gameObject);
+            return;
         }
 
-        // Destroy the bullet after impact
+        // 2. CHECK FOR PLAYER HIT
+        PlayerDeath deathScript = collision.gameObject.GetComponentInParent<PlayerDeath>();
+
+        if (deathScript != null)
+        {
+            deathScript.TriggerDeath(rb.velocity.x);
+        }
+
         Destroy(gameObject);
     }
 }
