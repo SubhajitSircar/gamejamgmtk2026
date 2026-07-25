@@ -9,6 +9,9 @@ public class MenuController : MonoBehaviour
 
     [SerializeField] private GameObject quitButton;
     [SerializeField] private GameObject firstButton;
+    [SerializeField] private GameObject creditsPage;
+    [SerializeField] private GameObject menuPage;
+    [SerializeField] private GameObject roundsSelect;
 
     void Start()
     {
@@ -34,9 +37,29 @@ public class MenuController : MonoBehaviour
         Debug.Log("Quit Game");
     }
 
-
-    public void PlayGame()
+    public void Credits()
     {
-        SceneManager.LoadScene("NewTest");
+        creditsPage.SetActive(true);
+        menuPage.SetActive(false);
+    }
+
+    public void RoundsSelect()
+    {
+        roundsSelect.SetActive(true);
+        menuPage.SetActive(false);
+    }
+
+    public void MainMenu()
+    {
+        menuPage.SetActive(true);
+        creditsPage.SetActive(false);
+        roundsSelect.SetActive(false);
+    }
+
+    public void PlayGame(int r)
+    {
+        GlobalScript g = GlobalScript.Instance;
+        g.StartMatch(r);
+        SceneManager.LoadScene(g.GetNextRoundScene());
     }
 }

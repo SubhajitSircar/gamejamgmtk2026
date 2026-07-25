@@ -12,6 +12,9 @@ public class GameManager : MonoBehaviour
 
     [Header("UI References")]
     public TextMeshProUGUI centerText;
+    public TMP_Text Player1RoundCount;
+    public TMP_Text Player2RoundCount;
+
 
     void Awake()
     {
@@ -20,6 +23,21 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        GlobalScript g =GlobalScript.Instance;
+        Debug.Log(g.CurrentRound);
+        if (g != null) { 
+ 
+            if (Player1RoundCount != null)
+            {
+                Player1RoundCount.text = g.Player1Wins.ToString();
+            }
+
+            if (Player2RoundCount != null)
+            {
+                Player2RoundCount.text = g.Player2Wins.ToString();
+            }
+        }
+
         StartCoroutine(DuelCountdownSequence());
     }
 
