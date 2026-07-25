@@ -445,8 +445,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   raiseKey: 119
-  raiseSpeed: 180
-  fallSpeed: 120
+  raiseSpeed: 400
+  fallSpeed: 340
 --- !u!1 &301268795
 GameObject:
   m_ObjectHideFlags: 0
@@ -493,8 +493,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   raiseKey: 273
-  raiseSpeed: 180
-  fallSpeed: 120
+  raiseSpeed: 400
+  fallSpeed: 340
 --- !u!1 &302387633
 GameObject:
   m_ObjectHideFlags: 0
