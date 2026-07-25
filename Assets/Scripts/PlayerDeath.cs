@@ -16,6 +16,13 @@ public class PlayerDeath : MonoBehaviour
         if (isDead) return;
         isDead = true;
 
+        // If we are in a level with a BlackoutManager, tell it to flash the lights!
+        if (BlackoutManager.instance != null)
+        {
+            BlackoutManager.instance.RestoreLights();
+        }
+        
+
         // 1. Disable player inputs so they can't keep shooting
         ArmController armCtrl = GetComponentInChildren<ArmController>();
         if (armCtrl != null) armCtrl.enabled = false;
