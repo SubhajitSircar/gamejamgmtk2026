@@ -314,6 +314,7 @@ MonoBehaviour:
   head: {fileID: 1153940826}
   body: {fileID: 1782881019}
   armPivot: {fileID: 301268796}
+  playing_against: 0
 --- !u!1 &194881864
 GameObject:
   m_ObjectHideFlags: 0
@@ -724,6 +725,7 @@ MonoBehaviour:
   isPlayer1Platform: 1
   moveHeight: 5
   speed: 2
+  player2Delay: 1
 --- !u!212 &431210978
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -871,6 +873,7 @@ MonoBehaviour:
   isPlayer1Platform: 0
   moveHeight: 5
   speed: 2
+  player2Delay: 1
 --- !u!212 &436627501
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1293,6 +1296,7 @@ MonoBehaviour:
   head: {fileID: 1563643227}
   body: {fileID: 1174221783}
   armPivot: {fileID: 214342069}
+  playing_against: 0
 --- !u!1 &1153940825
 GameObject:
   m_ObjectHideFlags: 0

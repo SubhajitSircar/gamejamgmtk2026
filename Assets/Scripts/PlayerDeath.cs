@@ -24,7 +24,6 @@ public class PlayerDeath : MonoBehaviour
         {
             BlackoutManager.instance.RestoreLights();
         }
-        
 
         // 1. Disable player inputs so they can't keep shooting
         ArmController armCtrl = GetComponentInChildren<ArmController>();
@@ -45,30 +44,46 @@ public class PlayerDeath : MonoBehaviour
         head.parent = null;
         body.parent = null;
 
-        // 3.1 activate gravity in the head for a valid fall
-        //if (head.GetComponent<Rigidbody2D>() != null)
-        //{
-        //    head.GetComponent<Rigidbody2D>().gravityScale = 1;
-        //}
+        // 3.1 Activate gravity in the head for a valid fall
+        if (head.GetComponent<Rigidbody2D>() != null)
+        {
+            head.GetComponent<Rigidbody2D>().gravityScale = 1;
+        }
 
         // 4. Start the grotesque animations
         StartCoroutine(DeathSequence(fallDirection));
-
     }
 
     IEnumerator DeathSequence(float fallDirection)
     {
         GlobalScript g = GlobalScript.Instance;
-        g.RecordRoundWinner(playing_against);
-        // Start both animations
+
+        // 1. SAFETY CHECK: Only record the score if the GlobalScript actually exists!
+        if (g != null)
+        {
+            g.RecordRoundWinner(playing_against);
+        }
+        else
+        {
+            Debug.LogWarning("GlobalScript is missing! (You are probably testing a single level). Skipping score tracking.");
+        }
+
+        // 2. Start both animations
         StartCoroutine(AnimateHead(fallDirection));
         StartCoroutine(AnimateBody(fallDirection));
 
         // Wait until the longest animation finishes
         yield return new WaitForSeconds(2f);
 
-
-        SceneManager.LoadScene(g.GetNextRoundScene());
+        // 3. SAFETY CHECK: Only try to load the next scene if GlobalScript exists
+        if (g != null)
+        {
+            SceneManager.LoadScene(g.GetNextRoundScene());
+        }
+        else
+        {
+            Debug.LogWarning("GlobalScript is missing! Cannot load the next scene automatically.");
+        }
     }
 
     IEnumerator AnimateHead(float dir)

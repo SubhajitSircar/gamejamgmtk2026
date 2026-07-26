@@ -46,9 +46,24 @@ public class CinematicCamera : MonoBehaviour
         Time.timeScale = 0.05f;
         Time.fixedDeltaTime = 0.02f * Time.timeScale;
 
+        // --- NEW FAIL-SAFE TIMEOUT ---
+        float maxRealTime = 3f; // Max 3 seconds of real-world time to hit
+        float elapsedRealTime = 0f;
+        bool isMiss = false;
+        // -----------------------------
+
         // Loop runs as long as there is at least 1 bullet in the air
         while (activeBullets.Count > 0)
         {
+            elapsedRealTime += Time.unscaledDeltaTime;
+
+            // If the bullet has been flying in slow-mo for too long, it missed!
+            if (elapsedRealTime > maxRealTime)
+            {
+                isMiss = true;
+                break; // Forcefully exit the while loop
+            }
+
             // Clean up any bullets that just hit the head and destroyed themselves
             activeBullets.RemoveAll(b => b == null);
 
@@ -93,18 +108,24 @@ public class CinematicCamera : MonoBehaviour
         // ==========================================
         // THE IMPACT & RESOLUTION
         // ==========================================
-        Time.timeScale = 0f;
-        yield return new WaitForSecondsRealtime(0.25f);
 
+        // Only do the dramatic time-stop and screen shake if it was a genuine hit!
+        if (!isMiss)
+        {
+            Time.timeScale = 0f;
+            yield return new WaitForSecondsRealtime(0.25f);
+            StartCoroutine(ScreenShake(0.2f, 0.4f));
+        }
+
+        // Snap everything back to normal regardless of hit or miss
         Time.timeScale = 1f;
         Time.fixedDeltaTime = 0.02f;
         mainCam.orthographicSize = originalSize;
         transform.position = originalPos;
 
         CleanupSplitCameras();
+        activeBullets.Clear();
         isKillCamActive = false;
-
-        StartCoroutine(ScreenShake(0.2f, 0.4f));
     }
 
     // Helper function to dynamically spawn a camera and set its screen space

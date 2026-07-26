@@ -37,4 +37,4 @@ public class EarthquakeCamera : MonoBehaviour
         // We add this right on top of wherever the Cinematic script moved the camera this frame
         transform.localPosition += currentShakeOffset;
     }
-}
+}   

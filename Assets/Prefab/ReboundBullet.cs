@@ -7,9 +7,15 @@ public class ReboundBullet : MonoBehaviour
     [SerializeField] private float speed = 15f;
     [SerializeField] private int maxBounces = 3;
 
+    [Header("VFX")]
+    public GameObject sparkEffectPrefab;
+
     private Rigidbody2D rb;
     private Vector2 previousVelocity;
     private int bounceCount;
+
+    // Tracks if we already told the camera to zoom in
+    private bool isKillCamTriggered = false;
 
     private void Awake()
     {
@@ -20,6 +26,30 @@ public class ReboundBullet : MonoBehaviour
     {
         rb.velocity = transform.right * speed;
         previousVelocity = rb.velocity;
+    }
+
+    private void Update()
+    {
+        // --- THE MISSING KILL CAM TRIGGER ---
+        if (!isKillCamTriggered && rb.velocity.sqrMagnitude > 0.1f)
+        {
+            // Shoot a laser 2 units forward in the current direction of travel
+            RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, rb.velocity.normalized, 2f);
+
+            foreach (RaycastHit2D hit in hits)
+            {
+                if (hit.collider != null && hit.collider.gameObject.name == "Head")
+                {
+                    isKillCamTriggered = true;
+
+                    if (CinematicCamera.instance != null)
+                    {
+                        CinematicCamera.instance.RegisterKillCam(transform);
+                    }
+                    break;
+                }
+            }
+        }
     }
 
     private void FixedUpdate()
@@ -33,30 +63,45 @@ public class ReboundBullet : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (!collision.gameObject.CompareTag("Rebounder"))
+        // 1. CHECK FOR PLAYER HIT
+        PlayerDeath deathScript = collision.gameObject.GetComponentInParent<PlayerDeath>();
+        if (deathScript != null)
+        {
+            deathScript.TriggerDeath(previousVelocity.x);
+            Destroy(gameObject);
             return;
+        }
 
-        if (collision.contactCount == 0)
+        // 2. CHECK FOR BULLET CLASH
+        if (collision.gameObject.CompareTag("Bullet"))
+        {
+            if (sparkEffectPrefab != null)
+            {
+                Instantiate(sparkEffectPrefab, collision.GetContact(0).point, Quaternion.identity);
+            }
+            if (CameraShake.instance != null) CameraShake.instance.Shake(0.1f, 0.15f);
+
+            Destroy(gameObject);
             return;
+        }
 
-        Bounce(collision.GetContact(0).normal);
+        // 3. BOUNCE OFF ENVIRONMENT
+        if (collision.contactCount > 0)
+        {
+            Bounce(collision.GetContact(0).normal);
+        }
     }
 
     private void Bounce(Vector2 surfaceNormal)
     {
         // Reflect the incoming direction.
-        Vector2 reflectedDirection =
-            Vector2.Reflect(previousVelocity.normalized, surfaceNormal);
+        Vector2 reflectedDirection = Vector2.Reflect(previousVelocity.normalized, surfaceNormal);
 
         // Apply reflected velocity.
         rb.velocity = reflectedDirection * speed;
 
         // Rotate bullet to face its new direction.
-        float angle = Mathf.Atan2(
-            reflectedDirection.y,
-            reflectedDirection.x
-        ) * Mathf.Rad2Deg;
-
+        float angle = Mathf.Atan2(reflectedDirection.y, reflectedDirection.x) * Mathf.Rad2Deg;
         rb.rotation = angle;
 
         bounceCount++;
@@ -65,6 +110,11 @@ public class ReboundBullet : MonoBehaviour
         if (bounceCount >= maxBounces)
         {
             Destroy(gameObject);
+        }
+        else
+        {
+            // Reset the trigger just in case the bullet grazed the head's raycast radius but bounced off a wall instead!
+            isKillCamTriggered = false;
         }
     }
 }

@@ -36,6 +36,19 @@ public class TriLaserShoot : MonoBehaviour
         realLaserIndex = Random.Range(0, 3);
     }
 
+    void OnDisable()
+    {
+        // Whenever this script is turned off (like during the typing phase), 
+        // force all the line renderers to turn off too!
+        foreach (var laser in lasers)
+        {
+            if (laser != null)
+            {
+                laser.enabled = false;
+            }
+        }
+    }
+
     void Update()
     {
         if (GameManager.instance == null || !GameManager.instance.isDuelActive || isReloading)

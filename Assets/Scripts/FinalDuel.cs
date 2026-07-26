@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class SequenceChallenge : MonoBehaviour
+public class FinalDuel : MonoBehaviour
 {
     [Header("P1 UI")]
     public GameObject p1Panel;
@@ -12,15 +12,18 @@ public class SequenceChallenge : MonoBehaviour
     public GameObject p2Panel;
     public TextMeshProUGUI[] p2KeyTexts;
 
-    [Header("Arm Controllers")]
+    [Header("Controllers to Lock")]
     public ArmController p1Arm;
     public ArmController p2Arm;
+
+    // Specifically grabbing the Tri-Lasers for the final round
+    public TriLaserShoot p1Gun;
+    public TriLaserShoot p2Gun;
 
     [Header("Arm Lock Settings")]
     public Transform p1ArmTransform;
     public Transform p2ArmTransform;
 
-    // Change these in Inspector if your arm orientation is different.
     public float p1LockedAngle = -90f;
     public float p2LockedAngle = 90f;
 
@@ -30,18 +33,12 @@ public class SequenceChallenge : MonoBehaviour
 
     private readonly KeyCode[] p1Keys =
     {
-        KeyCode.W,
-        KeyCode.A,
-        KeyCode.S,
-        KeyCode.D
+        KeyCode.W, KeyCode.A, KeyCode.S, KeyCode.D
     };
 
     private readonly KeyCode[] p2Keys =
     {
-        KeyCode.UpArrow,
-        KeyCode.DownArrow,
-        KeyCode.LeftArrow,
-        KeyCode.RightArrow
+        KeyCode.UpArrow, KeyCode.DownArrow, KeyCode.LeftArrow, KeyCode.RightArrow
     };
 
     private List<KeyCode> p1Sequence;
@@ -59,57 +56,44 @@ public class SequenceChallenge : MonoBehaviour
 
     void Start()
     {
-        // Hide sequence panels until DRAW!!
         p1Panel.SetActive(false);
         p2Panel.SetActive(false);
 
-        // Disable arm controls.
         p1Arm.enabled = false;
         p2Arm.enabled = false;
 
-        // Put both arms downward immediately.
+        // Disable the Tri-Lasers entirely so they don't fire or draw sweeping lasers early
+        if (p1Gun != null) p1Gun.enabled = false;
+        if (p2Gun != null) p2Gun.enabled = false;
+
         LockP1Arm();
         LockP2Arm();
     }
 
     void Update()
     {
-        // Wait for DRAW!!
-        if (!challengeStarted &&
-            GameManager.instance != null &&
-            GameManager.instance.isDuelActive)
+        if (!challengeStarted && GameManager.instance != null && GameManager.instance.isDuelActive)
         {
             StartChallenge();
         }
 
-        if (!challengeStarted)
-            return;
+        if (!challengeStarted) return;
 
-        if (!p1Finished)
-            CheckP1Input();
-
-        if (!p2Finished)
-            CheckP2Input();
+        if (!p1Finished) CheckP1Input();
+        if (!p2Finished) CheckP2Input();
     }
 
     void LateUpdate()
     {
-        // Keep each arm locked downward until
-        // that specific player finishes the challenge.
-
-        if (!p1Finished)
-            LockP1Arm();
-
-        if (!p2Finished)
-            LockP2Arm();
+        if (!p1Finished) LockP1Arm();
+        if (!p2Finished) LockP2Arm();
     }
 
     void LockP1Arm()
     {
         if (p1ArmTransform != null)
         {
-            p1ArmTransform.localRotation =
-                Quaternion.Euler(0f, 0f, p1LockedAngle);
+            p1ArmTransform.localRotation = Quaternion.Euler(0f, 0f, p1LockedAngle);
         }
     }
 
@@ -117,15 +101,13 @@ public class SequenceChallenge : MonoBehaviour
     {
         if (p2ArmTransform != null)
         {
-            p2ArmTransform.localRotation =
-                Quaternion.Euler(0f, 0f, p2LockedAngle);
+            p2ArmTransform.localRotation = Quaternion.Euler(0f, 0f, p2LockedAngle);
         }
     }
 
     void StartChallenge()
     {
         challengeStarted = true;
-
         p1Panel.SetActive(true);
         p2Panel.SetActive(true);
 
@@ -134,15 +116,13 @@ public class SequenceChallenge : MonoBehaviour
     }
 
     // =========================
-    // P1
+    // P1 Logic
     // =========================
 
     void GenerateP1Set()
     {
         p1Sequence = GenerateSequence(p1Keys);
-
         p1Index = 0;
-
         DisplaySequence(p1Sequence, p1KeyTexts);
     }
 
@@ -150,46 +130,35 @@ public class SequenceChallenge : MonoBehaviour
     {
         KeyCode pressedKey = KeyCode.None;
 
-        if (Input.GetKeyDown(KeyCode.W))
-            pressedKey = KeyCode.W;
-        else if (Input.GetKeyDown(KeyCode.A))
-            pressedKey = KeyCode.A;
-        else if (Input.GetKeyDown(KeyCode.S))
-            pressedKey = KeyCode.S;
-        else if (Input.GetKeyDown(KeyCode.D))
-            pressedKey = KeyCode.D;
+        if (Input.GetKeyDown(KeyCode.W)) pressedKey = KeyCode.W;
+        else if (Input.GetKeyDown(KeyCode.A)) pressedKey = KeyCode.A;
+        else if (Input.GetKeyDown(KeyCode.S)) pressedKey = KeyCode.S;
+        else if (Input.GetKeyDown(KeyCode.D)) pressedKey = KeyCode.D;
 
-        if (pressedKey == KeyCode.None)
-            return;
+        if (pressedKey == KeyCode.None) return;
 
         if (pressedKey == p1Sequence[p1Index])
         {
             p1Index++;
-
             UpdateP1Visuals();
 
             if (p1Index >= keysPerSet)
             {
                 p1CurrentSet++;
-
-                if (p1CurrentSet >= totalSets)
-                    CompleteP1();
-                else
-                    GenerateP1Set();
+                if (p1CurrentSet >= totalSets) CompleteP1();
+                else GenerateP1Set();
             }
         }
     }
 
     // =========================
-    // P2
+    // P2 Logic
     // =========================
 
     void GenerateP2Set()
     {
         p2Sequence = GenerateSequence(p2Keys);
-
         p2Index = 0;
-
         DisplaySequence(p2Sequence, p2KeyTexts);
     }
 
@@ -197,62 +166,42 @@ public class SequenceChallenge : MonoBehaviour
     {
         KeyCode pressedKey = KeyCode.None;
 
-        if (Input.GetKeyDown(KeyCode.UpArrow))
-            pressedKey = KeyCode.UpArrow;
-        else if (Input.GetKeyDown(KeyCode.DownArrow))
-            pressedKey = KeyCode.DownArrow;
-        else if (Input.GetKeyDown(KeyCode.LeftArrow))
-            pressedKey = KeyCode.LeftArrow;
-        else if (Input.GetKeyDown(KeyCode.RightArrow))
-            pressedKey = KeyCode.RightArrow;
+        if (Input.GetKeyDown(KeyCode.UpArrow)) pressedKey = KeyCode.UpArrow;
+        else if (Input.GetKeyDown(KeyCode.DownArrow)) pressedKey = KeyCode.DownArrow;
+        else if (Input.GetKeyDown(KeyCode.LeftArrow)) pressedKey = KeyCode.LeftArrow;
+        else if (Input.GetKeyDown(KeyCode.RightArrow)) pressedKey = KeyCode.RightArrow;
 
-        if (pressedKey == KeyCode.None)
-            return;
+        if (pressedKey == KeyCode.None) return;
 
         if (pressedKey == p2Sequence[p2Index])
         {
             p2Index++;
-
             UpdateP2Visuals();
 
             if (p2Index >= keysPerSet)
             {
                 p2CurrentSet++;
-
-                if (p2CurrentSet >= totalSets)
-                    CompleteP2();
-                else
-                    GenerateP2Set();
+                if (p2CurrentSet >= totalSets) CompleteP2();
+                else GenerateP2Set();
             }
         }
     }
 
     // =========================
-    // Sequence Generation
+    // Sequence Generation & UI
     // =========================
 
     List<KeyCode> GenerateSequence(KeyCode[] availableKeys)
     {
         List<KeyCode> sequence = new List<KeyCode>();
-
         for (int i = 0; i < keysPerSet; i++)
         {
-            int randomIndex =
-                Random.Range(0, availableKeys.Length);
-
-            sequence.Add(availableKeys[randomIndex]);
+            sequence.Add(availableKeys[Random.Range(0, availableKeys.Length)]);
         }
-
         return sequence;
     }
 
-    // =========================
-    // UI
-    // =========================
-
-    void DisplaySequence(
-        List<KeyCode> sequence,
-        TextMeshProUGUI[] texts)
+    void DisplaySequence(List<KeyCode> sequence, TextMeshProUGUI[] texts)
     {
         for (int i = 0; i < texts.Length; i++)
         {
@@ -263,38 +212,23 @@ public class SequenceChallenge : MonoBehaviour
 
     void UpdateP1Visuals()
     {
-        for (int i = 0; i < p1Index; i++)
-        {
-            p1KeyTexts[i].color = Color.green;
-        }
+        for (int i = 0; i < p1Index; i++) p1KeyTexts[i].color = Color.green;
     }
 
     void UpdateP2Visuals()
     {
-        for (int i = 0; i < p2Index; i++)
-        {
-            p2KeyTexts[i].color = Color.green;
-        }
+        for (int i = 0; i < p2Index; i++) p2KeyTexts[i].color = Color.green;
     }
 
     string GetKeyName(KeyCode key)
     {
         switch (key)
         {
-            case KeyCode.UpArrow:
-                return "↑";
-
-            case KeyCode.DownArrow:
-                return "↓";
-
-            case KeyCode.LeftArrow:
-                return "←";
-
-            case KeyCode.RightArrow:
-                return "→";
-
-            default:
-                return key.ToString();
+            case KeyCode.UpArrow: return "↑";
+            case KeyCode.DownArrow: return "↓";
+            case KeyCode.LeftArrow: return "←";
+            case KeyCode.RightArrow: return "→";
+            default: return key.ToString();
         }
     }
 
@@ -305,24 +239,20 @@ public class SequenceChallenge : MonoBehaviour
     void CompleteP1()
     {
         p1Finished = true;
-
         p1Panel.SetActive(false);
 
-        // Give control of the arm back to P1.
+        // Unlock the arm and the Tri-Laser gun!
         p1Arm.enabled = true;
-
-        Debug.Log("P1 ARM UNLOCKED!");
+        if (p1Gun != null) p1Gun.enabled = true;
     }
 
     void CompleteP2()
     {
         p2Finished = true;
-
         p2Panel.SetActive(false);
 
-        // Give control of the arm back to P2.
+        // Unlock the arm and the Tri-Laser gun!
         p2Arm.enabled = true;
-
-        Debug.Log("P2 ARM UNLOCKED!");
+        if (p2Gun != null) p2Gun.enabled = true;
     }
 }

@@ -2,94 +2,61 @@ using UnityEngine;
 
 public class MovingPlatform : MonoBehaviour
 {
-    public static bool p1ReachedTop = false;
-
+    [Header("Platform")]
     public bool isPlayer1Platform = true;
 
+    [Header("Movement")]
     public float moveHeight = 2f;
     public float speed = 2f;
+
+    [Header("P2 Delay")]
+    public float player2Delay = 1f;
 
     private Vector3 bottomPos;
     private Vector3 topPos;
 
     private bool goingUp = true;
+    private float sceneStartTime;
 
     void Start()
     {
-        bottomPos = transform.position;              // Ground position
+        // Starting position is the lowest point
+        bottomPos = transform.position;
+
+        // Platform can only move upward from its starting position
         topPos = bottomPos + Vector3.up * moveHeight;
+
+        sceneStartTime = Time.time;
     }
 
     void Update()
     {
-        if (!GameManager.instance.isDuelActive)
+        // P1 starts immediately.
+        // P2 waits before starting.
+        if (!isPlayer1Platform &&
+            Time.time < sceneStartTime + player2Delay)
+        {
             return;
+        }
 
-        if (isPlayer1Platform)
-            MovePlayer1Platform();
-        else
-            MovePlayer2Platform();
+        MovePlatform();
     }
 
-    void MovePlayer1Platform()
+    void MovePlatform()
     {
-        if (goingUp)
+        Vector3 target = goingUp ? topPos : bottomPos;
+
+        transform.position = Vector3.MoveTowards(
+            transform.position,
+            target,
+            speed * Time.deltaTime
+        );
+
+        // Reached top or bottom
+        if (Vector3.Distance(transform.position, target) < 0.01f)
         {
-            transform.position = Vector3.MoveTowards(
-                transform.position,
-                topPos,
-                speed * Time.deltaTime);
-
-            if (Vector3.Distance(transform.position, topPos) < 0.01f)
-            {
-                goingUp = false;
-                p1ReachedTop = true;
-            }
-        }
-        else
-        {
-            transform.position = Vector3.MoveTowards(
-                transform.position,
-                bottomPos,
-                speed * Time.deltaTime);
-
-            if (Vector3.Distance(transform.position, bottomPos) < 0.01f)
-            {
-                goingUp = true;
-                p1ReachedTop = false;
-            }
-        }
-    }
-
-    void MovePlayer2Platform()
-    {
-        // Wait until P1 reaches the top
-        if (!p1ReachedTop && goingUp)
-            return;
-
-        if (goingUp)
-        {
-            transform.position = Vector3.MoveTowards(
-                transform.position,
-                topPos,
-                speed * Time.deltaTime);
-
-            if (Vector3.Distance(transform.position, topPos) < 0.01f)
-            {
-                goingUp = false;
-            }
-        }
-        else
-        {
-            transform.position = Vector3.MoveTowards(
-                transform.position,
-                bottomPos,
-                speed * Time.deltaTime);
-
-            if (Vector3.Distance(transform.position, bottomPos) < 0.01f)
-            {
-                goingUp = true;
-            }
+            transform.position = target;
+            goingUp = !goingUp;
         }
     }
 }

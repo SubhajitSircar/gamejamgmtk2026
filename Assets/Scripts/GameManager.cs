@@ -8,12 +8,11 @@ public class GameManager : MonoBehaviour
 
     public bool isDuelActive = false;
 
-//    public DarknessManager darknessManager;
 
     [Header("UI References")]
     public TextMeshProUGUI centerText;
-    public TMP_Text Player1RoundCount;
-    public TMP_Text Player2RoundCount;
+    //    public TMP_Text Player1RoundCount;
+    //    public TMP_Text Player2RoundCount;
 
 
     void Awake()
@@ -23,20 +22,20 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        GlobalScript g =GlobalScript.Instance;
-        Debug.Log(g.CurrentRound);
-        if (g != null) { 
- 
-            if (Player1RoundCount != null)
-            {
-                Player1RoundCount.text = g.Player1Wins.ToString();
-            }
+        //GlobalScript g =GlobalScript.Instance;
+        //Debug.Log(g.CurrentRound);
+        //if (g != null) { 
 
-            if (Player2RoundCount != null)
-            {
-                Player2RoundCount.text = g.Player2Wins.ToString();
-            }
-        }
+        //    if (Player1RoundCount != null)
+        //    {
+        //        Player1RoundCount.text = g.Player1Wins.ToString();
+        //    }
+
+        //    if (Player2RoundCount != null)
+        //    {
+        //        Player2RoundCount.text = g.Player2Wins.ToString();
+        //    }
+        //}
 
         StartCoroutine(DuelCountdownSequence());
     }
@@ -59,8 +58,6 @@ public class GameManager : MonoBehaviour
         // Unlock inputs and start the duel
         centerText.text = "DRAW!!";
         isDuelActive = true;
-
-//        darknessManager.EnableDarkness();
 
 
         // Hide the DRAW text after 2 seconds
