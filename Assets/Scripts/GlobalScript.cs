@@ -22,6 +22,7 @@ public class GlobalScript : MonoBehaviour
     [Header("Round Scenes")]
     [SerializeField] private List<string> roundScenes = new();
     [SerializeField] private string gameOverScene;
+    [SerializeField] private string finalRoundScene;
 
     private void Awake()
     {
@@ -79,6 +80,10 @@ public class GlobalScript : MonoBehaviour
     {
         if (CurrentRound > TotalRounds)
             return gameOverScene;
+
+        if (CurrentRound == TotalRounds)
+            return finalRoundScene;
+
 
         return roundScenes[(CurrentRound - 1) % roundScenes.Count];
     }

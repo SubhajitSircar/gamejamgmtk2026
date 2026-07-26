@@ -12,6 +12,8 @@ public class MenuController : MonoBehaviour
     [SerializeField] private GameObject creditsPage;
     [SerializeField] private GameObject menuPage;
     [SerializeField] private GameObject roundsSelect;
+    [SerializeField] private GameObject creditsPageFirstButton;
+
 
     void Start()
     {
@@ -23,6 +25,7 @@ public class MenuController : MonoBehaviour
 
     private void OnEnable()
     {
+        Time.timeScale = 1;
         EventSystem.current.SetSelectedGameObject(firstButton);
     }
 
@@ -41,6 +44,10 @@ public class MenuController : MonoBehaviour
     {
         creditsPage.SetActive(true);
         menuPage.SetActive(false);
+        if (creditsPageFirstButton)
+        {
+            EventSystem.current.SetSelectedGameObject(creditsPageFirstButton);
+        }
     }
 
     public void RoundsSelect()
