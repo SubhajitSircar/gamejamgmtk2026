@@ -7,11 +7,14 @@ EditorBuildSettings:
   m_Scenes:
   - enabled: 1
     path: Assets/Scenes/MainMenu.unity
-    guid: ef001fd6d9a0c3a48b8ee77eae1cf6d1
-  - enabled: 1
-    path: Assets/Scenes/NewTest.unity
-    guid: b5ac0647e61556d41becdefc31a5c9e2
+    guid: 394d747237e901349aefb0f42f17d7e4
   - enabled: 1
     path: Assets/Scenes/Round_1.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
+  - enabled: 1
+    path: Assets/Scenes/Round_2_HighSpeed_Laser.unity
+    guid: c50707593309dae478e1a3973b80b2e7
+  - enabled: 1
+    path: Assets/Scenes/GameEnd.unity
+    guid: ef001fd6d9a0c3a48b8ee77eae1cf6d1
   m_configObjects: {}

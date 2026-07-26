@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class PlayerDeath : MonoBehaviour
 {
@@ -7,6 +8,8 @@ public class PlayerDeath : MonoBehaviour
     public Transform head;
     public Transform body;
     public Transform armPivot;
+
+    public GlobalScript.Player playing_against;
 
     private bool isDead = false;
 
@@ -49,8 +52,23 @@ public class PlayerDeath : MonoBehaviour
         //}
 
         // 4. Start the grotesque animations
+        StartCoroutine(DeathSequence(fallDirection));
+
+    }
+
+    IEnumerator DeathSequence(float fallDirection)
+    {
+        GlobalScript g = GlobalScript.Instance;
+        g.RecordRoundWinner(playing_against);
+        // Start both animations
         StartCoroutine(AnimateHead(fallDirection));
         StartCoroutine(AnimateBody(fallDirection));
+
+        // Wait until the longest animation finishes
+        yield return new WaitForSeconds(2f);
+
+
+        SceneManager.LoadScene(g.GetNextRoundScene());
     }
 
     IEnumerator AnimateHead(float dir)
