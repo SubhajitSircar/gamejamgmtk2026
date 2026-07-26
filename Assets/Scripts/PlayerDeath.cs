@@ -8,6 +8,7 @@ public class PlayerDeath : MonoBehaviour
     public Transform head;
     public Transform body;
     public Transform armPivot;
+    public AudioClip splat;
 
     public GlobalScript.Player playing_against;
 
@@ -56,6 +57,12 @@ public class PlayerDeath : MonoBehaviour
 
     IEnumerator DeathSequence(float fallDirection)
     {
+        // play sound from the audio source component
+        if (splat != null)
+        {
+            GetComponent<AudioSource>()?.PlayOneShot(splat);
+        }
+
         GlobalScript g = GlobalScript.Instance;
 
         // 1. SAFETY CHECK: Only record the score if the GlobalScript actually exists!
